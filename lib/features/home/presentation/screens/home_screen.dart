@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
+import 'package:learno/app/router/app_routes.dart';
+import 'package:learno/core/di/injection.dart';
 import 'package:learno/core/theme/theme.dart';
-import 'package:learno/features/home/data/datasources/home_local_datasource.dart';
-import 'package:learno/features/home/data/repositories/home_repository_impl.dart';
-import 'package:learno/features/home/domain/usecases/get_home_journeys.dart';
+import 'package:learno/features/auth/domain/entities/auth_user.dart';
+import 'package:learno/features/auth/presentation/bloc/auth_bloc.dart';
 import 'package:learno/features/home/presentation/bloc/home_bloc.dart';
 import 'package:learno/features/home/presentation/widgets/ask_learno_hero.dart';
 import 'package:learno/features/home/presentation/widgets/continue_learning_card.dart';
 import 'package:learno/features/home/presentation/widgets/home_header.dart';
-import 'package:learno/features/home/presentation/widgets/learno_bottom_nav.dart';
 import 'package:learno/features/home/presentation/widgets/other_journeys_section.dart';
 
 /// The primary Home screen for Learno, managed by HomeBloc and Clean Architecture.
@@ -27,11 +28,7 @@ class HomeScreen extends StatelessWidget {
     }
 
     return BlocProvider<HomeBloc>(
-      create: (context) => HomeBloc(
-        getHomeJourneys: GetHomeJourneys(
-          HomeRepositoryImpl(dataSource: const HomeMockDataSource()),
-        ),
-      )..add(const HomeLoadRequested()),
+      create: (context) => getIt<HomeBloc>()..add(const HomeLoadRequested()),
       child: const _HomeView(),
     );
   }
@@ -45,8 +42,6 @@ class _HomeView extends StatefulWidget {
 }
 
 class _HomeViewState extends State<_HomeView> {
-  int _currentNavIndex = 0;
-
   void _showFeedback(
     String message, {
     IconData icon = Icons.info_outline_rounded,
@@ -84,43 +79,82 @@ class _HomeViewState extends State<_HomeView> {
     );
   }
 
-  void _handleNavSelect(int index) {
-    setState(() {
-      _currentNavIndex = index;
-    });
+  void _openLogin() {
+    context.pushNamed(AppRoutes.loginName);
+  }
 
-    switch (index) {
-      case 0:
-        break;
-      case 1:
-        _showFeedback(
-          'My Learning journeys library is coming soon!',
-          icon: Icons.auto_stories_rounded,
-        );
-        break;
-      case 2:
-        _showFeedback(
-          'Ask Learno conversational mentor is ready for upcoming checkpoints!',
-          icon: Icons.auto_awesome_rounded,
-        );
-        break;
-      case 3:
-        _showFeedback(
-          'Skill mastery analytics & progress tracking coming soon!',
-          icon: Icons.insights_rounded,
-        );
-        break;
-      case 4:
-        _showFeedback(
-          'Learner profile & study preferences coming soon!',
-          icon: Icons.person_rounded,
-        );
-        break;
+  void _showAccountDialog(AuthUser user) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: const RoundedRectangleBorder(
+          borderRadius: AppRadii.borderDialog,
+        ),
+        title: Text(user.displayName, style: AppTypography.headlineMedium),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(user.email, style: AppTypography.bodyMedium),
+            const SizedBox(height: AppSpacing.xs),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.lavender.withValues(alpha: 0.25),
+                borderRadius: AppRadii.borderPill,
+              ),
+              child: Text(
+                'ROLE: ${user.role.toUpperCase()}',
+                style: AppTypography.labelSmall.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.deepInk,
+                  fontSize: 10,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('Close'),
+          ),
+          ElevatedButton.icon(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              context.read<AuthBloc>().add(const AuthLogoutRequested());
+              _showFeedback(
+                'Logged out successfully',
+                icon: Icons.logout_rounded,
+              );
+            },
+            icon: const Icon(Icons.logout_rounded, size: 16),
+            label: const Text('Log out'),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.coral,
+              foregroundColor: AppColors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  AuthBloc? _tryGetAuthBloc() {
+    try {
+      return context.read<AuthBloc>();
+    } catch (_) {
+      return null;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authBloc = _tryGetAuthBloc();
+    final authState = authBloc?.state;
+    final user = authState is AuthAuthenticated ? authState.user : null;
+    final headerName = user != null ? user.displayName : 'Learner';
+
     return Scaffold(
       backgroundColor: AppColors.warmIvory,
       body: SafeArea(
@@ -141,11 +175,14 @@ class _HomeViewState extends State<_HomeView> {
                   children: [
                     // 1. Header (Brand mark, Greeting, Profile avatar)
                     HomeHeader(
-                      userName: 'Alex',
-                      onAvatarTap: () => _showFeedback(
-                        'Signed in as Alex (alex@learno.app)',
-                        icon: Icons.account_circle_outlined,
-                      ),
+                      userName: headerName,
+                      onAvatarTap: () {
+                        if (user != null) {
+                          _showAccountDialog(user);
+                        } else {
+                          _openLogin();
+                        }
+                      },
                     ),
 
                     const SizedBox(height: AppSpacing.xs),
@@ -196,10 +233,6 @@ class _HomeViewState extends State<_HomeView> {
             };
           },
         ),
-      ),
-      bottomNavigationBar: LearnoBottomNav(
-        currentIndex: _currentNavIndex,
-        onItemSelected: _handleNavSelect,
       ),
     );
   }
