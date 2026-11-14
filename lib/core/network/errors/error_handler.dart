@@ -47,6 +47,8 @@ abstract final class ErrorHandler {
       ),
       BadRequestException(:final message, :final errorCode) =>
         ValidationFailure(message: message, code: errorCode),
+      CancellationException(:final message, :final errorCode) =>
+        CancellationFailure(message: message, code: errorCode),
       UnexpectedException(:final message, :final errorCode) =>
         UnexpectedFailure(message: message, code: errorCode),
       _ => UnexpectedFailure(message: appException.message),
@@ -74,9 +76,8 @@ abstract final class ErrorHandler {
         );
 
       case DioExceptionType.cancel:
-        return const UnexpectedException(
+        return const CancellationException(
           message: 'The request was cancelled.',
-          errorCode: 'REQUEST_CANCELLED',
         );
 
       case DioExceptionType.badResponse:

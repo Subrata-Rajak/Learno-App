@@ -27,4 +27,3 @@ class AppShell extends StatelessWidget {
     );
   }
 }
-

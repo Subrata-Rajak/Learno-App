@@ -15,8 +15,10 @@ abstract final class ApiEndpoints {
 
   // Conversations & Chat
   static const String conversations = '$apiVersion/conversation';
+  static String conversationDetails(String conversationId) =>
+      '$apiVersion/conversation/$conversationId';
   static String conversationMessages(String conversationId) =>
-      '$apiVersion/conversation/$conversationId/messages';
+      '$apiVersion/conversation/message/$conversationId';
   static String conversationChat(String conversationId) =>
       '$apiVersion/conversation/$conversationId/chat';
 
@@ -25,13 +27,19 @@ abstract final class ApiEndpoints {
 
   // Learning Goals
   static const String learningGoals = '$apiVersion/learning-goals';
+  static String learningGoalDetails(String id) =>
+      '$apiVersion/learning-goals/$id';
 
   // Roadmaps & Topics
   static const String roadmaps = '$apiVersion/roadmap';
   static String roadmapDetails(String roadmapId) =>
       '$apiVersion/roadmap/$roadmapId';
-  static String topicResources({
-    required String roadmapId,
-    required String topicId,
-  }) => '$apiVersion/roadmap/$roadmapId/topics/$topicId/resources';
+  static String roadmapByGoal(String learningGoalId) =>
+      '$apiVersion/roadmap?learningGoalId=$learningGoalId';
+  static String roadmapProgress(String roadmapId) =>
+      '$apiVersion/roadmap/$roadmapId/progress';
+  static String topicComplete(String topicId) =>
+      '$apiVersion/roadmap/topics/$topicId/complete';
+  static String topicResources(String topicId) =>
+      '$apiVersion/roadmap/topics/$topicId/resources';
 }

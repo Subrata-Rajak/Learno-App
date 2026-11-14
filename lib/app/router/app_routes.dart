@@ -9,6 +9,7 @@ abstract final class AppRoutes {
   static const String loginPath = '/login';
   static const String registerPath = '/register';
   static const String protectedSamplePath = '/protected-sample';
+  static const String roadmapDetailPath = '/roadmap/:roadmapId';
 
   // --- Route Names ---
   static const String homeName = 'home';
@@ -19,6 +20,10 @@ abstract final class AppRoutes {
   static const String loginName = 'login';
   static const String registerName = 'register';
   static const String protectedSampleName = 'protected-sample';
+  static const String roadmapDetailName = 'roadmap-detail';
+
+  // --- Helpers ---
+  static String roadmapDetail(String roadmapId) => '/roadmap/$roadmapId';
 
   // --- Query Parameters ---
   static const String redirectParam = 'from';

@@ -68,6 +68,14 @@ class ValidationFailure extends Failure {
   });
 }
 
+/// Domain failure representing a cancelled operation.
+class CancellationFailure extends Failure {
+  const CancellationFailure({
+    super.message = 'The operation was cancelled.',
+    super.code = 'REQUEST_CANCELLED',
+  });
+}
+
 /// Domain failure for unclassified or unexpected exceptions.
 class UnexpectedFailure extends Failure {
   const UnexpectedFailure({

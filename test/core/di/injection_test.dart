@@ -16,6 +16,24 @@ import 'package:learno/features/home/data/datasources/home_local_datasource.dart
 import 'package:learno/features/home/domain/repositories/home_repository.dart';
 import 'package:learno/features/home/domain/usecases/get_home_journeys.dart';
 import 'package:learno/features/home/presentation/bloc/home_bloc.dart';
+import 'package:learno/features/chat/data/datasources/chat_remote_data_source.dart';
+import 'package:learno/features/chat/domain/repositories/chat_repository.dart';
+import 'package:learno/features/chat/domain/usecases/create_conversation.dart';
+import 'package:learno/features/chat/domain/usecases/get_capabilities.dart';
+import 'package:learno/features/chat/domain/usecases/get_conversation.dart';
+import 'package:learno/features/chat/domain/usecases/get_conversation_messages.dart';
+import 'package:learno/features/chat/domain/usecases/get_conversations.dart';
+import 'package:learno/features/chat/domain/usecases/send_chat_message_stream.dart';
+import 'package:learno/features/chat/presentation/bloc/chat_bloc.dart';
+import 'package:learno/features/roadmap/data/datasources/roadmap_remote_data_source.dart';
+import 'package:learno/features/roadmap/domain/repositories/roadmap_repository.dart';
+import 'package:learno/features/roadmap/domain/usecases/complete_topic.dart';
+import 'package:learno/features/roadmap/domain/usecases/get_active_learning_goals.dart';
+import 'package:learno/features/roadmap/domain/usecases/get_roadmap.dart';
+import 'package:learno/features/roadmap/domain/usecases/get_roadmap_by_goal.dart';
+import 'package:learno/features/roadmap/domain/usecases/get_roadmap_progress.dart';
+import 'package:learno/features/roadmap/domain/usecases/get_topic_resources.dart';
+import 'package:learno/features/roadmap/presentation/bloc/roadmap_bloc.dart';
 
 void main() {
   group('Dependency Injection', () {
@@ -59,6 +77,28 @@ void main() {
         expect(getIt.isRegistered<GetHomeJourneys>(), isTrue);
         expect(getIt.isRegistered<HomeBloc>(), isTrue);
 
+        // Verify Chat dependencies
+        expect(getIt.isRegistered<ChatRemoteDataSource>(), isTrue);
+        expect(getIt.isRegistered<ChatRepository>(), isTrue);
+        expect(getIt.isRegistered<GetCapabilities>(), isTrue);
+        expect(getIt.isRegistered<CreateConversation>(), isTrue);
+        expect(getIt.isRegistered<GetConversation>(), isTrue);
+        expect(getIt.isRegistered<GetConversations>(), isTrue);
+        expect(getIt.isRegistered<GetConversationMessages>(), isTrue);
+        expect(getIt.isRegistered<SendChatMessageStream>(), isTrue);
+        expect(getIt.isRegistered<ChatBloc>(), isTrue);
+
+        // Verify Roadmap dependencies
+        expect(getIt.isRegistered<RoadmapRemoteDataSource>(), isTrue);
+        expect(getIt.isRegistered<RoadmapRepository>(), isTrue);
+        expect(getIt.isRegistered<GetRoadmap>(), isTrue);
+        expect(getIt.isRegistered<GetRoadmapByGoal>(), isTrue);
+        expect(getIt.isRegistered<GetRoadmapProgress>(), isTrue);
+        expect(getIt.isRegistered<CompleteTopic>(), isTrue);
+        expect(getIt.isRegistered<GetTopicResources>(), isTrue);
+        expect(getIt.isRegistered<GetActiveLearningGoals>(), isTrue);
+        expect(getIt.isRegistered<RoadmapBloc>(), isTrue);
+
         // Verify factories yield distinct instances
         final authBloc1 = getIt<AuthBloc>();
         final authBloc2 = getIt<AuthBloc>();
@@ -71,6 +111,18 @@ void main() {
         expect(identical(homeBloc1, homeBloc2), isFalse);
         homeBloc1.close();
         homeBloc2.close();
+
+        final chatBloc1 = getIt<ChatBloc>();
+        final chatBloc2 = getIt<ChatBloc>();
+        expect(identical(chatBloc1, chatBloc2), isFalse);
+        chatBloc1.close();
+        chatBloc2.close();
+
+        final roadmapBloc1 = getIt<RoadmapBloc>();
+        final roadmapBloc2 = getIt<RoadmapBloc>();
+        expect(identical(roadmapBloc1, roadmapBloc2), isFalse);
+        roadmapBloc1.close();
+        roadmapBloc2.close();
       },
     );
 
@@ -83,6 +135,8 @@ void main() {
       expect(getIt.isRegistered<AppConfig>(), isFalse);
       expect(getIt.isRegistered<AuthBloc>(), isFalse);
       expect(getIt.isRegistered<HomeBloc>(), isFalse);
+      expect(getIt.isRegistered<ChatBloc>(), isFalse);
+      expect(getIt.isRegistered<RoadmapBloc>(), isFalse);
     });
   });
 }

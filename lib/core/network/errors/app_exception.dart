@@ -81,6 +81,15 @@ class BadRequestException extends AppException {
   });
 }
 
+/// Occurs when an ongoing request or stream is explicitly cancelled by the caller.
+class CancellationException extends AppException {
+  const CancellationException({
+    super.message = 'The operation was cancelled.',
+    super.errorCode = 'REQUEST_CANCELLED',
+    super.details,
+  });
+}
+
 /// Occurs on unanticipated client errors, parsing bugs, or untyped exceptions.
 class UnexpectedException extends AppException {
   const UnexpectedException({

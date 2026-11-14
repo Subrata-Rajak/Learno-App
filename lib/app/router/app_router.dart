@@ -13,6 +13,7 @@ import 'package:learno/features/my_learning/presentation/screens/my_learning_scr
 import 'package:learno/features/profile/presentation/screens/profile_screen.dart';
 import 'package:learno/features/progress/presentation/screens/progress_screen.dart';
 import 'package:learno/features/protected_sample/presentation/screens/protected_sample_screen.dart';
+import 'package:learno/features/roadmap/presentation/screens/roadmap_detail_screen.dart';
 
 /// Global root navigator key for full-screen dialogs and auth routes.
 final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>(
@@ -153,6 +154,17 @@ GoRouter createAppRouter({
         path: AppRoutes.protectedSamplePath,
         name: AppRoutes.protectedSampleName,
         builder: (context, state) => const ProtectedSampleScreen(),
+      ),
+
+      // 4. Roadmap Detail Route (Outside Shell, Above Tabs)
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: AppRoutes.roadmapDetailPath,
+        name: AppRoutes.roadmapDetailName,
+        builder: (context, state) {
+          final roadmapId = state.pathParameters['roadmapId'] ?? '';
+          return RoadmapDetailScreen(roadmapId: roadmapId);
+        },
       ),
     ],
   );

@@ -34,13 +34,13 @@ void main() {
         await tester.tap(find.text('My Learning'));
         await tester.pumpAndSettle();
         expect(find.byType(MyLearningScreen), findsOneWidget);
-        expect(find.text('Roadmaps Coming Soon'), findsOneWidget);
+        expect(find.text('Track Your Learning Journeys'), findsOneWidget);
 
         // 3. Navigate to Branch 2: Ask Learno (Central Distinct Action)
         await tester.tap(find.text('Ask Learno'));
         await tester.pumpAndSettle();
         expect(find.byType(AskLearnoScreen), findsOneWidget);
-        expect(find.text('AI Mentor Coming Soon'), findsOneWidget);
+        expect(find.text('Meet Learno'), findsOneWidget);
 
         // 4. Navigate to Branch 3: Progress
         await tester.tap(find.text('Progress'));
@@ -107,7 +107,7 @@ void main() {
       await tester.pumpAndSettle();
 
       expect(find.byType(AskLearnoScreen), findsOneWidget);
-      expect(find.text('Your conversational AI mentor.'), findsOneWidget);
+      expect(find.text('Meet Learno'), findsOneWidget);
     });
   });
 }
